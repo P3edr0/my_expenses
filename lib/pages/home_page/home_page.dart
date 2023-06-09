@@ -1,9 +1,47 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:meus_gastos/components/bottom_navigator_bar.dart';
+import 'package:meus_gastos/models/expense.dart';
+import 'package:meus_gastos/pages/home_page/components/expense_details_card.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _HomeState();
+}
+
+int selectedIndexPage = 1;
+bool changeColor = false;
+List<Expense> expenses = [];
+final DateFormat date = DateFormat('EEEE - d MMMM y');
+
+class _HomeState extends State<HomePage> {
+  @override
+  void initState() {
+    expenses.add(Expense(
+        value: 139.99,
+        date: DateTime.now(),
+        description: "Pensão Alimentícia",
+        icon: Icons.child_friendly,
+        paymmentType: PaymmentType.money));
+    expenses.add(Expense(
+        value: 139.99,
+        date: DateTime.now(),
+        description: "Pensão Alimentícia",
+        icon: Icons.child_friendly,
+        paymmentType: PaymmentType.money));
+    expenses.add(Expense(
+        value: 1395.99,
+        date: DateTime.now(),
+        description: "Pensão Alimentícia",
+        icon: Icons.child_friendly,
+        paymmentType: PaymmentType.money));
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,115 +96,103 @@ class HomePage extends StatelessWidget {
           Expanded(
             flex: 2,
             child: ListView.builder(
-                itemCount: 6,
+                itemCount: expenses.length,
                 itemBuilder: ((context, index) {
-                  return Container(
-                    padding: const EdgeInsets.all(5),
-                    margin:
-                        const EdgeInsets.symmetric(vertical: 3, horizontal: 9),
-                    height: 80,
-                    decoration: BoxDecoration(
-                        // border: Border.all(color: Colors.green[700]!, width: 3),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.green.withOpacity(0.8),
-                              blurRadius: 2,
-                              offset: const Offset(2, 2)),
-                          BoxShadow(
-                              color: Colors.green.withOpacity(0.8),
-                              blurRadius: 2,
-                              offset: const Offset(-2, -2))
-                        ],
-                        color: Colors.green[900],
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.green,
-                          radius: 35,
-                          child: Container(
-                            height: 26,
-                            padding: const EdgeInsets.all(4.0),
-                            child: Row(
-                              children: const [
-                                Expanded(
-                                  child: Text(
-                                    "R\$139,90",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        overflow: TextOverflow.clip),
+                  return GestureDetector(
+                    onTap: (() async {
+                      ExpensesDetailsCard()
+                          .buildDialog(context, expenses[index]);
+                      print("Clicou");
+                    }),
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 3, horizontal: 9),
+                      height: 80,
+                      decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.green.withOpacity(0.8),
+                                blurRadius: 2,
+                                offset: const Offset(2, 2)),
+                            BoxShadow(
+                                color: Colors.green.withOpacity(0.8),
+                                blurRadius: 2,
+                                offset: const Offset(-2, -2))
+                          ],
+                          color: Colors.green[900],
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: Colors.green,
+                            radius: 35,
+                            child: Container(
+                              height: 26,
+                              padding: const EdgeInsets.all(4.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'R\$${expenses[index].value}',
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          overflow: TextOverflow.clip),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Column(
-                          children: const [
-                            Text(
-                              "Presente para a bebê",
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  overflow: TextOverflow.clip),
-                            ),
-                            SizedBox(height: 5),
-                            Icon(
-                              Icons.cake,
-                              color: Colors.white,
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              "22/02/23",
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FontStyle.italic,
-                                  color: Colors.white,
-                                  overflow: TextOverflow.clip),
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                            onPressed: (() {}),
-                            icon: const Icon(
-                              Icons.delete,
-                              color: Colors.white,
-                            ))
-                      ],
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          Column(
+                            children: [
+                              Text(
+                                ' ${expenses[index].description!}',
+                                style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    overflow: TextOverflow.clip),
+                              ),
+                              const SizedBox(height: 5),
+                              Icon(
+                                expenses[index].icon,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                date.format(expenses[index].date!),
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    fontStyle: FontStyle.italic,
+                                    color: Colors.white,
+                                    overflow: TextOverflow.clip),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                              onPressed: (() {}),
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ))
+                        ],
+                      ),
                     ),
                   );
                 })),
           )
         ],
       ),
-      bottomNavigationBar: Container(
-        height: 50,
-        color: Colors.green[700],
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.attach_money,
-                  color: Colors.white,
-                )),
-            IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.attach_money, color: Colors.white)),
-            IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.attach_money, color: Colors.white))
-          ],
-        ),
-      ),
+      bottomNavigationBar: BottomNavigatorBar(
+          selectedIndexPage: selectedIndexPage, changeColor: changeColor),
     );
   }
 
