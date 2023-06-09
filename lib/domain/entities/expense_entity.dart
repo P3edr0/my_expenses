@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 enum PaymmentType { card, money, pix }
 
-class Expense {
+class ExpenseEntity {
   double? value;
   String? description;
   IconData? icon;
   DateTime? date;
   PaymmentType? paymmentType;
 
-  Expense(
+  ExpenseEntity(
       {this.value, this.description, this.icon, this.date, this.paymmentType});
 }

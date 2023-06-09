@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 
-import 'pages/home_page/home_page.dart';
+import 'presentation/ui/pages/home_page/home_page.dart';
 
 void main(List<String> args) {
   Intl.defaultLocale = 'pt_BR';

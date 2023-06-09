@@ -1,10 +1,14 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
 class BottomNavigatorBar extends StatefulWidget {
   int selectedIndexPage;
   bool changeColor;
-  BottomNavigatorBar(
-      {super.key, required this.changeColor, required this.selectedIndexPage});
+  BottomNavigatorBar({
+    Key? key,
+    required this.selectedIndexPage,
+    required this.changeColor,
+  }) : super(key: key);
 
   @override
   State<BottomNavigatorBar> createState() => _BottomNavigatorBarState();

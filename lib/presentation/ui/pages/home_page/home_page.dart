@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:meus_gastos/components/bottom_navigator_bar.dart';
-import 'package:meus_gastos/models/expense.dart';
-import 'package:meus_gastos/pages/home_page/components/expense_details_card.dart';
+import 'package:meus_gastos/domain/entities/expense_entity.dart';
+import 'package:meus_gastos/presentation/ui/components/bottom_navigator_bar.dart';
+import 'package:meus_gastos/presentation/ui/pages/home_page/components/expense_details_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,25 +15,25 @@ class HomePage extends StatefulWidget {
 
 int selectedIndexPage = 1;
 bool changeColor = false;
-List<Expense> expenses = [];
+List<ExpenseEntity> expenses = [];
 final DateFormat date = DateFormat('EEEE - d MMMM y');
 
 class _HomeState extends State<HomePage> {
   @override
   void initState() {
-    expenses.add(Expense(
+    expenses.add(ExpenseEntity(
         value: 139.99,
         date: DateTime.now(),
         description: "Pensão Alimentícia",
         icon: Icons.child_friendly,
         paymmentType: PaymmentType.money));
-    expenses.add(Expense(
+    expenses.add(ExpenseEntity(
         value: 139.99,
         date: DateTime.now(),
         description: "Pensão Alimentícia",
         icon: Icons.child_friendly,
         paymmentType: PaymmentType.money));
-    expenses.add(Expense(
+    expenses.add(ExpenseEntity(
         value: 1395.99,
         date: DateTime.now(),
         description: "Pensão Alimentícia",
