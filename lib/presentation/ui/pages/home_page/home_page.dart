@@ -1,10 +1,13 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:graphic/graphic.dart';
 import 'package:intl/intl.dart';
 import 'package:meus_gastos/domain/entities/expense_entity.dart';
+
 import 'package:meus_gastos/presentation/ui/components/bottom_navigator_bar.dart';
 import 'package:meus_gastos/presentation/ui/pages/home_page/components/expense_details_card.dart';
+
+import '../../components/expense_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,28 +18,42 @@ class HomePage extends StatefulWidget {
 
 int selectedIndexPage = 1;
 bool changeColor = false;
+bool detail = true;
 List<ExpenseEntity> expenses = [];
+List<Map<String,dynamic>> newValues = [{'Veterinário':15}, {'lanche': 12.99},{'Uber':17.75}];
 final DateFormat date = DateFormat('EEEE - d MMMM y');
 
 class _HomeState extends State<HomePage> {
+
   @override
   void initState() {
+
     expenses.add(ExpenseEntity(
+      name: 'Pensão alimentícia',
         value: 139.99,
         date: DateTime.now(),
-        description: "Pensão Alimentícia",
+        description: "Pensão do cleiton",
+        author: 'Pedro C',
         icon: Icons.child_friendly,
         paymmentType: PaymmentType.money));
     expenses.add(ExpenseEntity(
+      name: 'Ração do Luke',
+
         value: 139.99,
         date: DateTime.now(),
-        description: "Pensão Alimentícia",
+        description: "Ração do doguinho",
+        author: 'Pedro C',
+
         icon: Icons.child_friendly,
         paymmentType: PaymmentType.money));
     expenses.add(ExpenseEntity(
-        value: 1395.99,
+      name: 'Calça nova',
+
+        value: 135.99,
         date: DateTime.now(),
-        description: "Pensão Alimentícia",
+        author: 'Glacy C',
+
+        description: "Calça para dança",
         icon: Icons.child_friendly,
         paymmentType: PaymmentType.money));
     super.initState();
@@ -52,45 +69,118 @@ class _HomeState extends State<HomePage> {
         children: [
           Expanded(
             flex: 1,
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 5),
-              // width: MediaQuery.of(context).size.width,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                      width: MediaQuery.of(context).size.width - 20,
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 5),
-                      decoration: BoxDecoration(
-                          border:
-                              Border.all(color: Colors.green[700]!, width: 3),
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.8),
-                                blurRadius: 5,
-                                offset: const Offset(5, 5)),
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.8),
-                                blurRadius: 5,
-                                offset: const Offset(-5, -5))
-                          ],
-                          color: Colors.white),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            costBar('S'),
-                            costBar('T'),
-                            costBar('Q'),
-                            costBar('Q'),
-                            costBar('S'),
-                            costBar('S'),
-                            costBar('D')
-                          ]))
-                ],
-              ),
+            child: GestureDetector(
+              onTap: (() => setState(() {
+                detail = !detail;
+              })),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 5),
+                // width: MediaQuery.of(context).size.width,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                        width: MediaQuery.of(context).size.width - 20,
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 5),
+                        decoration: BoxDecoration(
+                            border:
+                                Border.all(color: Colors.green[700]!, width: 3),
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey.withOpacity(0.8),
+                                  blurRadius: 5,
+                                  offset: const Offset(5, 5)),
+                              BoxShadow(
+                                  color: Colors.grey.withOpacity(0.8),
+                                  blurRadius: 5,
+                                  offset: const Offset(-5, -5))
+                            ],
+                            color: Colors.white),
+                        child:detail? Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              costBar('S',Colors.green),
+                              costBar('T',Colors.green),
+                              costBar('Q',Colors.orange),
+                              costBar('Q',Colors.green),
+                              costBar('S',Colors.green),
+                              costBar('S',Colors.red),
+                              costBar('D',Colors.green)
+                            ]):
+                             Row(children: [
+Expanded(child: Chart( data:newValues,
+                  variables: {
+                    'day': Variable(
+                      accessor: (Map datum) => datum['day'] as String,
+                      scale: OrdinalScale(inflate: true),
+                    ),
+                    'value': Variable(
+                      accessor: (Map datum) => datum['value'] as num,
+                      scale: LinearScale(min: 0, max: 1500),
+                    ),
+                    'group': Variable(
+                      accessor: (Map datum) => datum['group'].toString(),
+                    ),
+                  }, 
+                  
+                  
+                  marks: [
+                    AreaMark(
+                      position:
+                          Varset('day') * Varset('value') / Varset('group'),
+                      shape: ShapeEncode(value: BasicAreaShape(smooth: true)),
+                      gradient: GradientEncode(
+                        variable: 'group',
+                        values: [
+                          const LinearGradient(
+                            begin: Alignment(0, 0),
+                            end: Alignment(0, 1),
+                            colors: [
+                              Color.fromARGB(204, 128, 255, 165),
+                              Color.fromARGB(204, 1, 191, 236),
+                            ],
+                          ),
+
+ const LinearGradient(
+                            begin: Alignment(0, 0),
+                            end: Alignment(0, 1),
+                            colors: [
+                              Color.fromARGB(204, 0, 221, 255),
+                              Color.fromARGB(204, 77, 119, 255),
+                            ],
+                          ),
+                          const LinearGradient(
+                            begin: Alignment(0, 0),
+                            end: Alignment(0, 1),
+                            colors: [
+                              Color.fromARGB(204, 55, 162, 255),
+                              Color.fromARGB(204, 116, 21, 219),
+                            ],
+                          ),
+                          const LinearGradient(
+                            begin: Alignment(0, 0),
+                            end: Alignment(0, 1),
+                            colors: [
+                              Color.fromARGB(204, 255, 0, 135),
+                              Color.fromARGB(204, 135, 0, 157),
+                            ],
+                          ),
+
+                        ]))]
+                          
+                          
+                          
+                          ))
+
+
+                             ])
+                            )
+                  ],
+                ),
+              ) 
             ),
           ),
           Expanded(
@@ -99,12 +189,11 @@ class _HomeState extends State<HomePage> {
                 itemCount: expenses.length,
                 itemBuilder: ((context, index) {
                   return GestureDetector(
-                    onTap: (() async {
-                      ExpensesDetailsCard()
+                    onTap: () async {
+                      await ExpensesDetailsCard()
                           .buildDialog(context, expenses[index]);
-                      print("Clicou");
-                    }),
-                    child: Container(
+                      //print("Clicou");
+                    },                    child: Container(
                       padding: const EdgeInsets.all(5),
                       margin: const EdgeInsets.symmetric(
                           vertical: 3, horizontal: 9),
@@ -153,7 +242,7 @@ class _HomeState extends State<HomePage> {
                           Column(
                             children: [
                               Text(
-                                ' ${expenses[index].description!}',
+                                ' ${expenses[index].name!}',
                                 style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -196,40 +285,4 @@ class _HomeState extends State<HomePage> {
     );
   }
 
-  Widget costBar(String weekday) {
-    return Column(
-      children: [
-        Flexible(
-          fit: FlexFit.loose,
-          child: Container(
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: Colors.green, width: 1)),
-            alignment: Alignment.bottomCenter,
-            margin: const EdgeInsets.all(10),
-            height: 120,
-            width: 15,
-            padding: const EdgeInsets.symmetric(horizontal: 1),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              height: Random().nextDouble() * 80,
-              width: 13,
-            ),
-          ),
-        ),
-        const SizedBox(
-          height: 5,
-        ),
-        Text(weekday,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ))
-      ],
-    );
-  }
 }
