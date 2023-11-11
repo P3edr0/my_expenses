@@ -22,6 +22,42 @@ bool detail = true;
 List<ExpenseEntity> expenses = [];
 List<Map<String,dynamic>> newValues = [{'Veterinário':15}, {'lanche': 12.99},{'Uber':17.75}];
 final DateFormat date = DateFormat('EEEE - d MMMM y');
+List<MarkElement> centralPieLabel(
+  Size size,
+  Offset anchor,
+  Map<int, Tuple> selectedTuples,
+) {
+  final tuple = selectedTuples.values.last;
+
+  final titleElement = LabelElement(
+      text: '${tuple['genre']}\n',
+      anchor: const Offset(130, 90),
+      style: LabelStyle(
+          textStyle: const TextStyle(
+            fontSize: 14,
+            color: Colors.black87,
+          ),
+          align: Alignment.topCenter));
+
+  final valueElement = LabelElement(
+      text: tuple['cost'].toString(),
+      anchor: const Offset(130, 80),
+      style: LabelStyle(
+          textStyle: const TextStyle(
+            fontSize: 28,
+            color: Colors.black87,
+          ),
+          align: Alignment.bottomCenter));
+
+  return [titleElement, valueElement];
+}
+const basicData = [
+  {'genre': 'Calça', 'cost': 99.00},
+  {'genre': 'Blusa', 'cost': 55.50},
+  {'genre': 'Camiseta', 'cost': 9.99},
+  {'genre': 'Vacina', 'cost': 157.99},
+  {'genre': 'Almoço', 'cost': 25.80},
+];
 
 class _HomeState extends State<HomePage> {
 
@@ -111,69 +147,87 @@ class _HomeState extends State<HomePage> {
                               costBar('D',Colors.green)
                             ]):
                              Row(children: [
-Expanded(child: Chart( data:newValues,
-                  variables: {
-                    'day': Variable(
-                      accessor: (Map datum) => datum['day'] as String,
-                      scale: OrdinalScale(inflate: true),
-                    ),
-                    'value': Variable(
-                      accessor: (Map datum) => datum['value'] as num,
-                      scale: LinearScale(min: 0, max: 1500),
-                    ),
-                    'group': Variable(
-                      accessor: (Map datum) => datum['group'].toString(),
-                    ),
-                  }, 
-                  
-                  
-                  marks: [
-                    AreaMark(
-                      position:
-                          Varset('day') * Varset('value') / Varset('group'),
-                      shape: ShapeEncode(value: BasicAreaShape(smooth: true)),
-                      gradient: GradientEncode(
-                        variable: 'group',
-                        values: [
-                          const LinearGradient(
-                            begin: Alignment(0, 0),
-                            end: Alignment(0, 1),
-                            colors: [
-                              Color.fromARGB(204, 128, 255, 165),
-                              Color.fromARGB(204, 1, 191, 236),
-                            ],
-                          ),
+Expanded(child: 
 
- const LinearGradient(
-                            begin: Alignment(0, 0),
-                            end: Alignment(0, 1),
-                            colors: [
-                              Color.fromARGB(204, 0, 221, 255),
-                              Color.fromARGB(204, 77, 119, 255),
-                            ],
+Row( 
+  children: [
+   const  Padding(
+      padding:  EdgeInsets.only(left:10.0),
+      child:  Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text("Valor total:"),
+          Text("R\$ 2789,50"),
+        ],
+      ),
+    ),
+        Expanded(
+          child: Chart(
+            
+                        data: basicData,
+            
+                        variables: {
+            
+                          'genre': Variable(
+            
+                            accessor: (Map map) => map['genre'] as String,
+            
                           ),
-                          const LinearGradient(
-                            begin: Alignment(0, 0),
-                            end: Alignment(0, 1),
-                            colors: [
-                              Color.fromARGB(204, 55, 162, 255),
-                              Color.fromARGB(204, 116, 21, 219),
-                            ],
+            
+                          'cost': Variable(
+            
+                            accessor: (Map map) => map['cost'] as num,
+            
                           ),
-                          const LinearGradient(
-                            begin: Alignment(0, 0),
-                            end: Alignment(0, 1),
-                            colors: [
-                              Color.fromARGB(204, 255, 0, 135),
-                              Color.fromARGB(204, 135, 0, 157),
-                            ],
-                          ),
-
-                        ]))]
-                          
-                          
-                          
-                          ))
+            
+                        },
+            
+                        transforms: [
+            
+                          Proportion(
+            
+                            variable: 'cost',
+            
+                            as: 'percent',
+            
+                          )
+            
+                        ],
+            
+                        marks: [
+            
+                          IntervalMark(
+            
+                            position: Varset('percent') / Varset('genre'),
+            
+                            color: ColorEncode(
+            
+                                variable: 'genre', values: [Colors.black,Colors.green,Colors.red,Colors.purple,Colors.yellow]),
+            
+                            modifiers: [StackModifier()],
+            
+                          )
+            
+                        ],
+            
+                        coord: PolarCoord(
+            
+                          transposed: true,
+            
+                          dimCount: 1,
+            
+                          startRadius: 0.8,
+            
+                        ),
+            
+                        selections: {'tap': PointSelection()},
+            
+                        tooltip: TooltipGuide(renderer: centralPieLabel),
+            
+                      ),
+        ),
+  ],
+),)
 
 
                              ])
