@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:meus_gastos/presentation/ui/pages/home_page/components/add_expense_card.dart';
 
 class BottomNavigatorBar extends StatefulWidget {
-   int selectedIndexPage;
+  int selectedIndexPage;
   bool changeColor;
   BottomNavigatorBar({
     Key? key,
@@ -64,27 +64,19 @@ class _BottomNavigatorBarState extends State<BottomNavigatorBar> {
                 )),
           ),
           GestureDetector(
-            onTap: 
-            
-            
-            (() async {
-              if(widget.selectedIndexPage ==1){
-                
+            onTap: (() async {
+              if (widget.selectedIndexPage == 1) {
+                await AddExpenseCard().buildDialog(context);
+                //print("Clicou");
 
-                      await AddExpenseCard()
-                          .buildDialog(context);
-                      //print("Clicou");
-                       
-log("Páge => ${ widget.selectedIndexPage}");
-
-              }else{
+                log("Páge => ${widget.selectedIndexPage}");
+              } else {
                 setState(() {
                   widget.selectedIndexPage = 1;
                   widget.changeColor = true;
-});
+                });
               }
-              
-   } ),
+            }),
             child: AnimatedContainer(
                 margin: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
