@@ -4,16 +4,7 @@ import 'package:intl/intl.dart';
 class AddExpenseCard {
   final DateFormat date = DateFormat('EEEE - d MMMM y');
   final DateFormat dateShort = DateFormat('d/M/y');
-  final List<String> expenseTypes = [
-    "Lazer",
-    "Saúde",
-    "Comida",
-    "Mercado",
-    "Vestuário",
-    "Automóvel",
-    "Educação",
-    "Casa"
-  ];
+
   Future buildDialog(context) async {
     return await showDialog(
         barrierDismissible: true,
@@ -27,7 +18,7 @@ class AddExpenseCard {
                 decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.8),
                     borderRadius: BorderRadius.circular(10)),
-                height: 500,
+                height: 535,
                 width: 200,
                 child: Column(
                   children: [
@@ -101,8 +92,8 @@ class AddExpenseCard {
 
                         if (pickedDate != null) {
                           //pickedDate output format => 2021-03-10 00:00:00.000
-                          String formattedDate =
-                              DateFormat('yyyy-MM-dd').format(pickedDate);
+                          // String formattedDate =
+                          //     DateFormat('yyyy-MM-dd').format(pickedDate);
                         }
                       },
                       child: Container(
@@ -173,22 +164,12 @@ class AddExpenseCard {
                           overflow: TextOverflow.clip),
                     ),
                     SizedBox(
-                        height: 80,
+                        height: 96,
                         width: 250,
                         child: PaymmentCheckBox(
                           context: context,
                         )),
-                    SizedBox(
-                      height: 80,
-                      width: 250,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 8,
-                        itemBuilder: (BuildContext context, index) {
-                          return ListTile(title: Text(expenseTypes[index]));
-                        },
-                      ),
-                    ),
+                    const ExpenseTypesListWidget(),
                     TextButton(
                         onPressed: () => Navigator.pop(context),
                         child: Container(
@@ -330,4 +311,78 @@ class _PaymmentCheckBoxState extends State<PaymmentCheckBox> {
       ),
     );
   }
+}
+
+class ExpenseTypesListWidget extends StatefulWidget {
+  const ExpenseTypesListWidget({
+    super.key,
+  });
+
+  @override
+  State<ExpenseTypesListWidget> createState() => _ExpenseTypesListWidgetState();
+}
+
+class _ExpenseTypesListWidgetState extends State<ExpenseTypesListWidget> {
+  final List<ExpenseTypes> expenseTypes = [
+    ExpenseTypes(legend: "Lazer", icon: Icons.sports_soccer),
+    ExpenseTypes(legend: "Saúde", icon: Icons.favorite),
+    ExpenseTypes(legend: "Comida", icon: Icons.restaurant),
+    ExpenseTypes(legend: "Mercado", icon: Icons.shopping_cart),
+    ExpenseTypes(legend: "Vestuário", icon: Icons.shopping_bag_outlined),
+    ExpenseTypes(legend: "Automóvel", icon: Icons.directions_car),
+    ExpenseTypes(legend: "Educação", icon: Icons.book),
+    ExpenseTypes(legend: "Casa", icon: Icons.home),
+  ];
+  int selected = -1;
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 60,
+      width: 250,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: 8,
+        separatorBuilder: (context, index) => Container(
+          width: 1,
+          height: 5,
+          color: Colors.transparent,
+        ),
+        itemBuilder: (BuildContext context, index) {
+          return SizedBox(
+              width: 100,
+              height: 14,
+              child: ListTile(
+                  onTap: () {
+                    setState(() {
+                      print(('Objeto ${expenseTypes[index].legend}'));
+                      selected = index;
+                    });
+                  },
+                  contentPadding: const EdgeInsets.all(0),
+                  subtitle: Text(
+                    expenseTypes[index].legend,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: selected != index ? Colors.white : Colors.green,
+                      overflow: TextOverflow.clip,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  subtitleTextStyle: const TextStyle(color: Colors.red),
+                  title: Icon(
+                    expenseTypes[index].icon,
+                    color: selected != index ? Colors.white : Colors.green,
+                  )));
+        },
+      ),
+    );
+  }
+}
+
+class ExpenseTypes {
+  String legend;
+  IconData icon;
+
+  ExpenseTypes({required this.legend, required this.icon});
 }
