@@ -15,7 +15,7 @@ class ExpenseDto extends ExpenseEntity {
   @override
   IconData? icon;
   @override
-  DateTime? date;
+  String? date;
   @override
   PaymmentType? paymmentType;
 
@@ -41,7 +41,7 @@ class ExpenseDto extends ExpenseEntity {
         value: map["value"],
         description: map["description"],
         icon: _iconTranslate(map["icon"]),
-        date: DateTime.parse(map["date"]),
+        date: map["date"],
         paymmentType: map["paymmentType"]);
   }
 }

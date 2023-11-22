@@ -1,9 +1,27 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:meus_gastos/domain/entities/expense_entity.dart';
+import 'package:meus_gastos/presentation/ui/controller/add_expense_controller.dart';
 
 class AddExpenseCard {
   final DateFormat date = DateFormat('EEEE - d MMMM y');
   final DateFormat dateShort = DateFormat('d/M/y');
+  ExpenseEntity tempExpense = ExpenseEntity();
+  AddExpenseController addExpenseController = AddExpenseController();
+
+  void saveExpense(ExpenseEntity tempExpense) {
+    tempExpense.name = addExpenseController.nameController.text;
+    tempExpense.description = addExpenseController.descriptionController.text;
+    tempExpense.date = addExpenseController.dateController.text;
+    tempExpense.value =
+        double.parse(addExpenseController.valueController.text.substring(2));
+    log(tempExpense.name!);
+    log(tempExpense.description!);
+    log(tempExpense.date!);
+    log(tempExpense.value.toString());
+  }
 
   Future buildDialog(context) async {
     return await showDialog(
@@ -47,6 +65,7 @@ class AddExpenseCard {
                         height: 30,
                         child: TextFormField(
                             cursorColor: Colors.white,
+                            controller: addExpenseController.nameController,
                             style: const TextStyle(color: Colors.white),
                             decoration: const InputDecoration(
                                 border: InputBorder.none,
@@ -70,6 +89,8 @@ class AddExpenseCard {
                         child: TextFormField(
                             cursorColor: Colors.white,
                             style: const TextStyle(color: Colors.white),
+                            controller:
+                                addExpenseController.descriptionController,
                             decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.only(
@@ -92,8 +113,10 @@ class AddExpenseCard {
 
                         if (pickedDate != null) {
                           //pickedDate output format => 2021-03-10 00:00:00.000
-                          // String formattedDate =
-                          //     DateFormat('yyyy-MM-dd').format(pickedDate);
+                          String formattedDate =
+                              DateFormat('yyyy-MM-dd').format(pickedDate);
+                          addExpenseController.dateController.text =
+                              formattedDate;
                         }
                       },
                       child: Container(
@@ -113,7 +136,7 @@ class AddExpenseCard {
                             ),
                             const SizedBox(width: 50),
                             Text(
-                              dateShort.format(DateTime.now()),
+                              addExpenseController.dateController.text,
                               style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -147,8 +170,8 @@ class AddExpenseCard {
                         width: 100,
                         height: 30,
                         child: TextFormField(
-                            initialValue: "R\$ ",
                             keyboardType: TextInputType.number,
+                            controller: addExpenseController.valueController,
                             cursorColor: Colors.white,
                             style: const TextStyle(color: Colors.white),
                             decoration: const InputDecoration(
@@ -168,10 +191,23 @@ class AddExpenseCard {
                         width: 250,
                         child: PaymmentCheckBox(
                           context: context,
+                          paymmentCheckList:
+                              addExpenseController.paymmentCheckList,
                         )),
+                    const Text(
+                      "Tipo de gasto",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          overflow: TextOverflow.clip),
+                    ),
                     const ExpenseTypesListWidget(),
                     TextButton(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () {
+                          saveExpense(tempExpense);
+                          Navigator.pop(context);
+                        },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 40, vertical: 8),
@@ -197,7 +233,10 @@ class AddExpenseCard {
 }
 
 class PaymmentCheckBox extends StatefulWidget {
-  const PaymmentCheckBox({super.key, required BuildContext context});
+  const PaymmentCheckBox(
+      {super.key,
+      required BuildContext context,
+      required List<bool> paymmentCheckList});
 
   @override
   State<PaymmentCheckBox> createState() => _PaymmentCheckBoxState();
@@ -354,7 +393,6 @@ class _ExpenseTypesListWidgetState extends State<ExpenseTypesListWidget> {
               child: ListTile(
                   onTap: () {
                     setState(() {
-                      print(('Objeto ${expenseTypes[index].legend}'));
                       selected = index;
                     });
                   },
