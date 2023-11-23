@@ -103,56 +103,7 @@ class AddExpenseCard {
                           color: Colors.white,
                           overflow: TextOverflow.clip),
                     ),
-                    InkWell(
-                      onTap: () async {
-                        DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(2022),
-                            lastDate: DateTime(2030));
-
-                        if (pickedDate != null) {
-                          //pickedDate output format => 2021-03-10 00:00:00.000
-                          String formattedDate =
-                              DateFormat('yyyy-MM-dd').format(pickedDate);
-                          addExpenseController.dateController.text =
-                              formattedDate;
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.only(left: 10),
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        decoration: BoxDecoration(
-                            color: Colors.green[700],
-                            borderRadius: BorderRadius.circular(10)),
-                        width: 250,
-                        height: 30,
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.calendar_today_outlined,
-                              color: Colors.white,
-                              size: 25,
-                            ),
-                            const SizedBox(width: 50),
-                            Text(
-                              addExpenseController.dateController.text,
-                              style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  overflow: TextOverflow.clip),
-                            ),
-                            const SizedBox(width: 45),
-                            const Icon(
-                              Icons.arrow_drop_down_rounded,
-                              color: Colors.white,
-                              size: 30,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    DateSelect(addExpenseController: addExpenseController),
                     const SizedBox(height: 10),
                     const Text(
                       "Valor",
@@ -398,7 +349,7 @@ class _ExpenseTypesListWidgetState extends State<ExpenseTypesListWidget> {
                   },
                   contentPadding: const EdgeInsets.all(0),
                   subtitle: Text(
-                    expenseTypes[index].legend,
+                    expenseTypes[index].legend!,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -418,9 +369,75 @@ class _ExpenseTypesListWidgetState extends State<ExpenseTypesListWidget> {
   }
 }
 
+class DateSelect extends StatefulWidget {
+  const DateSelect({super.key, required this.addExpenseController});
+
+  final AddExpenseController addExpenseController;
+  @override
+  State<DateSelect> createState() => _DateSelectState();
+}
+
+class _DateSelectState extends State<DateSelect> {
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () async {
+        DateTime? pickedDate = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2022),
+            lastDate: DateTime(2030));
+
+        if (pickedDate != null) {
+          //pickedDate output format => 2021-03-10 00:00:00.000
+          String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
+          setState(() {
+            widget.addExpenseController.updateDateController(formattedDate);
+          });
+
+          log(formattedDate);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.only(left: 10),
+        margin: const EdgeInsets.symmetric(vertical: 5),
+        decoration: BoxDecoration(
+            color: Colors.green[700], borderRadius: BorderRadius.circular(10)),
+        width: 250,
+        height: 30,
+        child: Row(
+          children: [
+            const Icon(
+              Icons.calendar_today_outlined,
+              color: Colors.white,
+              size: 25,
+            ),
+            const SizedBox(width: 50),
+            Text(
+              widget.addExpenseController.dateController.text,
+              style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  overflow: TextOverflow.clip),
+            ),
+            const SizedBox(width: 45),
+            const Icon(
+              Icons.arrow_drop_down_rounded,
+              color: Colors.white,
+              size: 30,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class ExpenseTypes {
-  String legend;
-  IconData icon;
+  String? legend;
+  IconData? icon;
 
   ExpenseTypes({required this.legend, required this.icon});
+  ExpenseTypes.empty({this.legend, this.icon});
 }
