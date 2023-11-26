@@ -4,54 +4,54 @@
  PURA.
 */
 
-import 'package:flutter/material.dart';
 import 'package:meus_gastos/domain/entities/expense_entity.dart';
 
+import '../../presentation/ui/pages/home_page/components/add_expense_card.dart';
+
 class ExpenseDto extends ExpenseEntity {
+  @override
+  String? name;
   @override
   double? value;
   @override
   String? description;
   @override
-  IconData? icon;
-  @override
   String? date;
   @override
+  String? author;
+  @override
   PaymmentType? paymmentType;
+  @override
+  ExpenseTypes? expenseTypes;
 
   ExpenseDto(
-      {required this.value,
+      {required this.name,
+      required this.value,
       required this.description,
-      required this.icon,
       required this.date,
-      required this.paymmentType});
+      required this.paymmentType,
+      required this.author,
+      required this.expenseTypes});
 
   Map toMap() {
     return {
+      'author': author,
       'value': value,
       'description': description,
-      'icon': icon,
       'date': date,
-      'paymmentType': paymmentType
+      'paymmentType': paymmentType,
+      'expenseTypes': expenseTypes
     };
   }
 
   static ExpenseDto fromMap(Map map) {
     return ExpenseDto(
+        name: map['name'],
+        author: map['author'],
         value: map["value"],
         description: map["description"],
-        icon: _iconTranslate(map["icon"]),
         date: map["date"],
-        paymmentType: map["paymmentType"]);
-  }
-}
-
-IconData _iconTranslate(String iconText) {
-  switch (iconText) {
-    case 'Icons.close':
-      return Icons.close;
-
-    default:
-      return Icons.close;
+        paymmentType: map["paymmentType"],
+        expenseTypes: map['expenseTypes']);
   }
 }

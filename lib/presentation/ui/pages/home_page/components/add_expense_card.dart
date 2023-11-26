@@ -2,28 +2,13 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:meus_gastos/domain/entities/expense_entity.dart';
 import 'package:meus_gastos/presentation/ui/controller/add_expense_controller.dart';
 
 class AddExpenseCard {
   final DateFormat date = DateFormat('EEEE - d MMMM y');
   final DateFormat dateShort = DateFormat('d/M/y');
-  ExpenseEntity tempExpense = ExpenseEntity();
-  AddExpenseController addExpenseController = AddExpenseController();
 
-  void saveExpense(ExpenseEntity tempExpense) {
-    tempExpense.name = addExpenseController.nameController.text;
-    tempExpense.description = addExpenseController.descriptionController.text;
-    tempExpense.date = addExpenseController.dateController.text;
-    tempExpense.value =
-        double.parse(addExpenseController.valueController.text.substring(2));
-    log(tempExpense.name!);
-    log(tempExpense.description!);
-    log(tempExpense.date!);
-    log(tempExpense.value.toString());
-  }
-
-  Future buildDialog(context) async {
+  Future buildDialog(context, addExpenseController) async {
     return await showDialog(
         barrierDismissible: true,
         context: context,
@@ -142,8 +127,7 @@ class AddExpenseCard {
                         width: 250,
                         child: PaymmentCheckBox(
                           context: context,
-                          paymmentCheckList:
-                              addExpenseController.paymmentCheckList,
+                          addExpenseController: addExpenseController,
                         )),
                     const Text(
                       "Tipo de gasto",
@@ -153,10 +137,11 @@ class AddExpenseCard {
                           color: Colors.white,
                           overflow: TextOverflow.clip),
                     ),
-                    const ExpenseTypesListWidget(),
+                    ExpenseTypesListWidget(
+                        addExpenseController: addExpenseController),
                     TextButton(
                         onPressed: () {
-                          saveExpense(tempExpense);
+                          addExpenseController.addExpense();
                           Navigator.pop(context);
                         },
                         child: Container(
@@ -187,7 +172,8 @@ class PaymmentCheckBox extends StatefulWidget {
   const PaymmentCheckBox(
       {super.key,
       required BuildContext context,
-      required List<bool> paymmentCheckList});
+      required this.addExpenseController});
+  final AddExpenseController addExpenseController;
 
   @override
   State<PaymmentCheckBox> createState() => _PaymmentCheckBoxState();
@@ -195,7 +181,6 @@ class PaymmentCheckBox extends StatefulWidget {
 
 class _PaymmentCheckBoxState extends State<PaymmentCheckBox> {
   bool? isChecked = true;
-  List<bool> paymmentCheckList = [false, false, false];
   @override
   Widget build(context) {
     return Material(
@@ -210,12 +195,13 @@ class _PaymmentCheckBoxState extends State<PaymmentCheckBox> {
                   splashRadius: 1,
                   onPressed: (() {
                     setState(() {
-                      paymmentCheckList[0] = !paymmentCheckList[0];
-                      paymmentCheckList[1] = false;
-                      paymmentCheckList[2] = false;
+                      widget.addExpenseController.paymmentCheckList[0] =
+                          !widget.addExpenseController.paymmentCheckList[0];
+                      widget.addExpenseController.paymmentCheckList[1] = false;
+                      widget.addExpenseController.paymmentCheckList[2] = false;
                     });
                   }),
-                  icon: paymmentCheckList[0]
+                  icon: widget.addExpenseController.paymmentCheckList[0]
                       ? const Icon(
                           Icons.check_box,
                           color: Colors.green,
@@ -238,12 +224,13 @@ class _PaymmentCheckBoxState extends State<PaymmentCheckBox> {
                   splashRadius: 1,
                   onPressed: (() {
                     setState(() {
-                      paymmentCheckList[1] = !paymmentCheckList[1];
-                      paymmentCheckList[0] = false;
-                      paymmentCheckList[2] = false;
+                      widget.addExpenseController.paymmentCheckList[1] =
+                          !widget.addExpenseController.paymmentCheckList[1];
+                      widget.addExpenseController.paymmentCheckList[0] = false;
+                      widget.addExpenseController.paymmentCheckList[2] = false;
                     });
                   }),
-                  icon: paymmentCheckList[1]
+                  icon: widget.addExpenseController.paymmentCheckList[1]
                       ? const Icon(
                           Icons.check_box,
                           color: Colors.green,
@@ -271,12 +258,13 @@ class _PaymmentCheckBoxState extends State<PaymmentCheckBox> {
                   splashRadius: 1,
                   onPressed: (() {
                     setState(() {
-                      paymmentCheckList[0] = false;
-                      paymmentCheckList[1] = false;
-                      paymmentCheckList[2] = !paymmentCheckList[2];
+                      widget.addExpenseController.paymmentCheckList[0] = false;
+                      widget.addExpenseController.paymmentCheckList[1] = false;
+                      widget.addExpenseController.paymmentCheckList[2] =
+                          !widget.addExpenseController.paymmentCheckList[2];
                     });
                   }),
-                  icon: paymmentCheckList[2]
+                  icon: widget.addExpenseController.paymmentCheckList[2]
                       ? const Icon(
                           Icons.check_box,
                           color: Colors.green,
@@ -304,9 +292,9 @@ class _PaymmentCheckBoxState extends State<PaymmentCheckBox> {
 }
 
 class ExpenseTypesListWidget extends StatefulWidget {
-  const ExpenseTypesListWidget({
-    super.key,
-  });
+  final AddExpenseController addExpenseController;
+
+  const ExpenseTypesListWidget({super.key, required this.addExpenseController});
 
   @override
   State<ExpenseTypesListWidget> createState() => _ExpenseTypesListWidgetState();
@@ -324,6 +312,16 @@ class _ExpenseTypesListWidgetState extends State<ExpenseTypesListWidget> {
     ExpenseTypes(legend: "Casa", icon: Icons.home),
   ];
   int selected = -1;
+  @override
+  void initState() {
+    if (widget.addExpenseController.expenseTypes.icon != null) {
+      selected = expenseTypes.indexOf(expenseTypes.singleWhere((element) =>
+          element.legend == widget.addExpenseController.expenseTypes.legend));
+    }
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -345,6 +343,8 @@ class _ExpenseTypesListWidgetState extends State<ExpenseTypesListWidget> {
                   onTap: () {
                     setState(() {
                       selected = index;
+                      widget.addExpenseController.expenseTypes =
+                          expenseTypes[index];
                     });
                   },
                   contentPadding: const EdgeInsets.all(0),
@@ -392,7 +392,8 @@ class _DateSelectState extends State<DateSelect> {
           //pickedDate output format => 2021-03-10 00:00:00.000
           String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
           setState(() {
-            widget.addExpenseController.updateDateController(formattedDate);
+            widget.addExpenseController.dateController =
+                TextEditingController(text: formattedDate);
           });
 
           log(formattedDate);

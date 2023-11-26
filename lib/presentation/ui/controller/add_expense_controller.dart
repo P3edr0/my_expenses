@@ -1,27 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:meus_gastos/data/dtos/expense_dto.dart';
+import 'package:meus_gastos/domain/entities/expense_entity.dart';
+import 'package:meus_gastos/domain/entities/user_entity.dart';
 import 'package:meus_gastos/presentation/ui/pages/home_page/components/add_expense_card.dart';
 
 class AddExpenseController {
+  UserEntity userEntity = UserEntity();
   TextEditingController nameController = TextEditingController(text: '');
   TextEditingController descriptionController = TextEditingController(text: '');
   TextEditingController dateController = TextEditingController(
       text: DateFormat('dd-MM-yyyy').format(DateTime.now()));
   TextEditingController valueController =
       TextEditingController(text: 'R\$ 0.0');
-  TextEditingController paymmentTypeController =
-      TextEditingController(text: '');
+
   List<bool> paymmentCheckList = [false, false, false];
   ExpenseTypes expenseTypes = ExpenseTypes.empty();
 
-  void updateNameController(String newName) => nameController.text = newName;
-  void updateDescriptionController(String newDescription) =>
-      descriptionController.text = newDescription;
-  void updateDateController(String newDate) => dateController.text = newDate;
-  void updateValueController(String newValue) =>
-      valueController.text = newValue;
-  void updatePaymmentCheckList(List<bool> newPaymmentCheckList) =>
-      paymmentCheckList = newPaymmentCheckList;
-  void updateexpenseTypes(ExpenseTypes newExpenseTypes) =>
-      expenseTypes = newExpenseTypes;
+  List<ExpenseEntity> expensesList = [];
+
+  PaymmentType _paymmentTypeTranslate() {
+    if (paymmentCheckList[0]) {
+      return PaymmentType.pix;
+    } else if (paymmentCheckList[1]) {
+      return PaymmentType.money;
+    } else {
+      return PaymmentType.card;
+    }
+  }
+
+  void addExpense() {
+    expensesList.insert(
+        0,
+        ExpenseDto(
+            name: nameController.text,
+            value: double.parse(valueController.text.substring(2)),
+            description: descriptionController.text,
+            date: dateController.text,
+            paymmentType: _paymmentTypeTranslate(),
+            author: userEntity.name,
+            expenseTypes: expenseTypes));
+    emptyExpense();
+  }
+
+  void emptyExpense() {
+    userEntity = UserEntity();
+    nameController = TextEditingController(text: '');
+    descriptionController = TextEditingController(text: '');
+    dateController = TextEditingController(
+        text: DateFormat('dd-MM-yyyy').format(DateTime.now()));
+    valueController = TextEditingController(text: 'R\$ 0.0');
+
+    paymmentCheckList = [false, false, false];
+    expenseTypes = ExpenseTypes.empty();
+  }
 }

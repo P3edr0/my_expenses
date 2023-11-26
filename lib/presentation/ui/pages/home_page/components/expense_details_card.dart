@@ -22,7 +22,7 @@ class ExpensesDetailsCard {
               child: Column(
                 children: [
                   Icon(
-                    expense.icon,
+                    expense.expenseTypes!.icon,
                     size: 30,
                     color: Colors.green,
                   ),

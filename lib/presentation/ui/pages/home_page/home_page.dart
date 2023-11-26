@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:graphic/graphic.dart';
 import 'package:intl/intl.dart';
-import 'package:meus_gastos/domain/entities/expense_entity.dart';
 import 'package:meus_gastos/presentation/ui/components/bottom_navigator_bar.dart';
+import 'package:meus_gastos/presentation/ui/controller/add_expense_controller.dart';
 import 'package:meus_gastos/presentation/ui/pages/home_page/components/expense_details_card.dart';
+import 'package:meus_gastos/presentation/utils/constants.dart';
 
 import '../../components/expense_bar.dart';
 
@@ -14,10 +15,11 @@ class HomePage extends StatefulWidget {
   State<StatefulWidget> createState() => _HomeState();
 }
 
+AddExpenseController homeAddExpenseController = AddExpenseController();
 int selectedIndexPage = 1;
 bool changeColor = false;
 bool detail = true;
-List<ExpenseEntity> expenses = [];
+// List<ExpenseEntity> expenses = [];
 List<Map<String, dynamic>> newValues = [
   {'Veterinário': 15},
   {'lanche': 12.99},
@@ -65,36 +67,14 @@ const basicData = [
 class _HomeState extends State<HomePage> {
   @override
   void initState() {
-    expenses.add(ExpenseEntity(
-        name: 'Pensão alimentícia',
-        value: 139.99,
-        date: DateTime.now().toString(),
-        description: "Pensão do cleiton",
-        author: 'Pedro C',
-        icon: Icons.child_friendly,
-        paymmentType: PaymmentType.money));
-    expenses.add(ExpenseEntity(
-        name: 'Ração do Luke',
-        value: 139.99,
-        date: DateTime.now().toString(),
-        description: "Ração do doguinho",
-        author: 'Pedro C',
-        icon: Icons.child_friendly,
-        paymmentType: PaymmentType.money));
-    expenses.add(ExpenseEntity(
-        name: 'Calça nova',
-        value: 135.99,
-        date: DateTime.now().toString(),
-        author: 'Glacy C',
-        description: "Calça para dança",
-        icon: Icons.child_friendly,
-        paymmentType: PaymmentType.money));
+    setState(() {});
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFEBF3EB),
       appBar: AppBar(
           backgroundColor: Colors.green[800],
           title: const Text("Minhas Despesas")),
@@ -108,7 +88,6 @@ class _HomeState extends State<HomePage> {
                     })),
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 5),
-                  // width: MediaQuery.of(context).size.width,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -216,105 +195,130 @@ class _HomeState extends State<HomePage> {
                 )),
           ),
           Expanded(
-            flex: 2,
-            child: ListView.builder(
-                itemCount: expenses.length,
-                itemBuilder: ((context, index) {
-                  return GestureDetector(
-                    onTap: () async {
-                      await ExpensesDetailsCard()
-                          .buildDialog(context, expenses[index]);
-                      //print("Clicou");
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(5),
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 3, horizontal: 9),
-                      height: 80,
-                      decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.green.withOpacity(0.8),
-                                blurRadius: 2,
-                                offset: const Offset(2, 2)),
-                            BoxShadow(
-                                color: Colors.green.withOpacity(0.8),
-                                blurRadius: 2,
-                                offset: const Offset(-2, -2))
-                          ],
-                          color: Colors.green[900],
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.green,
-                            radius: 35,
-                            child: Container(
-                              height: 26,
-                              padding: const EdgeInsets.all(4.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      'R\$${expenses[index].value}',
+              flex: 2,
+              child: homeAddExpenseController.expensesList.isEmpty
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Lista de gastos vazia',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green[700],
+                              overflow: TextOverflow.clip),
+                        ),
+                        Image.asset(growMoney)
+                        // Icon(
+                        //   Icons.monetization_on_rounded,
+                        //   color: Colors.green[700],
+                        //   size: 50,
+                        // )
+                      ],
+                    )
+                  : ListView.builder(
+                      itemCount: homeAddExpenseController.expensesList.length,
+                      itemBuilder: ((context, index) {
+                        return GestureDetector(
+                          onTap: () async {
+                            await ExpensesDetailsCard().buildDialog(context,
+                                homeAddExpenseController.expensesList[index]);
+                            //print("Clicou");
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 3, horizontal: 9),
+                            height: 80,
+                            decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Colors.green.withOpacity(0.8),
+                                      blurRadius: 2,
+                                      offset: const Offset(2, 2)),
+                                  BoxShadow(
+                                      color: Colors.green.withOpacity(0.8),
+                                      blurRadius: 2,
+                                      offset: const Offset(-2, -2))
+                                ],
+                                color: Colors.green[900],
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor: Colors.green,
+                                  radius: 35,
+                                  child: Container(
+                                    height: 26,
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            'R\$${homeAddExpenseController.expensesList[index].value}',
+                                            style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                                overflow: TextOverflow.clip),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 20,
+                                ),
+                                Column(
+                                  children: [
+                                    Text(
+                                      ' ${homeAddExpenseController.expensesList[index].name!}',
                                       style: const TextStyle(
-                                          fontSize: 14,
+                                          fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.white,
                                           overflow: TextOverflow.clip),
                                     ),
-                                  ),
-                                ],
-                              ),
+                                    const SizedBox(height: 5),
+                                    Icon(
+                                      homeAddExpenseController
+                                          .expensesList[index]
+                                          .expenseTypes!
+                                          .icon,
+                                      color: Colors.white,
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      homeAddExpenseController
+                                          .expensesList[index].date!,
+                                      style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          fontStyle: FontStyle.italic,
+                                          color: Colors.white,
+                                          overflow: TextOverflow.clip),
+                                    ),
+                                  ],
+                                ),
+                                IconButton(
+                                    onPressed: (() {}),
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.white,
+                                    ))
+                              ],
                             ),
                           ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                ' ${expenses[index].name!}',
-                                style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    overflow: TextOverflow.clip),
-                              ),
-                              const SizedBox(height: 5),
-                              Icon(
-                                expenses[index].icon,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                expenses[index].date!,
-                                style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FontStyle.italic,
-                                    color: Colors.white,
-                                    overflow: TextOverflow.clip),
-                              ),
-                            ],
-                          ),
-                          IconButton(
-                              onPressed: (() {}),
-                              icon: const Icon(
-                                Icons.delete,
-                                color: Colors.white,
-                              ))
-                        ],
-                      ),
-                    ),
-                  );
-                })),
-          )
+                        );
+                      })))
         ],
       ),
       bottomNavigationBar: BottomNavigatorBar(
-          selectedIndexPage: selectedIndexPage, changeColor: changeColor),
+          selectedIndexPage: selectedIndexPage,
+          changeColor: changeColor,
+          addExpenseController: homeAddExpenseController),
     );
   }
 }

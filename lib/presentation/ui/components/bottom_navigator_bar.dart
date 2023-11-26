@@ -2,22 +2,25 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:meus_gastos/presentation/ui/controller/add_expense_controller.dart';
 import 'package:meus_gastos/presentation/ui/pages/home_page/components/add_expense_card.dart';
 
 class BottomNavigatorBar extends StatefulWidget {
-  int selectedIndexPage;
-  bool changeColor;
   BottomNavigatorBar({
     Key? key,
     required this.selectedIndexPage,
     required this.changeColor,
+    required this.addExpenseController,
   }) : super(key: key);
-
+  int selectedIndexPage;
+  bool changeColor;
+  AddExpenseController addExpenseController;
   @override
   State<BottomNavigatorBar> createState() => _BottomNavigatorBarState();
 }
 
 class _BottomNavigatorBarState extends State<BottomNavigatorBar> {
+  AddExpenseCard addExpenseCard = AddExpenseCard();
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
@@ -66,7 +69,9 @@ class _BottomNavigatorBarState extends State<BottomNavigatorBar> {
           GestureDetector(
             onTap: (() async {
               if (widget.selectedIndexPage == 1) {
-                await AddExpenseCard().buildDialog(context);
+                await addExpenseCard
+                    .buildDialog(context, widget.addExpenseController)
+                    .whenComplete(() => setState(() {}));
                 //print("Clicou");
 
                 log("Páge => ${widget.selectedIndexPage}");
