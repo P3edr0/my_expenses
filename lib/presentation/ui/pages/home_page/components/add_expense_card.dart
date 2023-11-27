@@ -318,7 +318,6 @@ class _ExpenseTypesListWidgetState extends State<ExpenseTypesListWidget> {
       selected = expenseTypes.indexOf(expenseTypes.singleWhere((element) =>
           element.legend == widget.addExpenseController.expenseTypes.legend));
     }
-    // TODO: implement initState
     super.initState();
   }
 

@@ -5,7 +5,7 @@ import 'package:meus_gastos/domain/entities/expense_entity.dart';
 import 'package:meus_gastos/domain/entities/user_entity.dart';
 import 'package:meus_gastos/presentation/ui/pages/home_page/components/add_expense_card.dart';
 
-class AddExpenseController {
+class AddExpenseController extends ChangeNotifier {
   UserEntity userEntity = UserEntity();
   TextEditingController nameController = TextEditingController(text: '');
   TextEditingController descriptionController = TextEditingController(text: '');
@@ -40,7 +40,13 @@ class AddExpenseController {
             paymmentType: _paymmentTypeTranslate(),
             author: userEntity.name,
             expenseTypes: expenseTypes));
+    notifyListeners(); // Notificar os ouvintes sobre a mudança na lista
     emptyExpense();
+  }
+
+  void removeExpense(int index) {
+    expensesList.removeAt(index);
+    notifyListeners(); // Notificar os ouvintes sobre a mudança na lista
   }
 
   void emptyExpense() {
