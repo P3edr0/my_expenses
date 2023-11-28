@@ -3,6 +3,7 @@ import 'package:graphic/graphic.dart';
 import 'package:intl/intl.dart';
 import 'package:meus_gastos/presentation/ui/components/bottom_navigator_bar.dart';
 import 'package:meus_gastos/presentation/ui/controller/add_expense_controller.dart';
+import 'package:meus_gastos/presentation/ui/controller/home_controller.dart';
 import 'package:meus_gastos/presentation/ui/pages/home_page/components/expense_details_card.dart';
 import 'package:meus_gastos/presentation/utils/constants.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +18,7 @@ class HomePage extends StatefulWidget {
 }
 
 AddExpenseController mainAddExpenseController = AddExpenseController();
+HomeController homeController = HomeController();
 int selectedIndexPage = 1;
 bool changeColor = false;
 bool detail = true;
@@ -68,6 +70,7 @@ const basicData = [
 class _HomeState extends State<HomePage> {
   @override
   void initState() {
+    homeController.expenseDateTranslater(DateTime.now());
     super.initState();
   }
 
@@ -115,15 +118,12 @@ class _HomeState extends State<HomePage> {
                               ? Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
-                                  children: [
-                                      costBar('S', Colors.green),
-                                      costBar('T', Colors.green),
-                                      costBar('Q', Colors.orange),
-                                      costBar('Q', Colors.green),
-                                      costBar('S', Colors.green),
-                                      costBar('S', Colors.red),
-                                      costBar('D', Colors.green)
-                                    ])
+                                  children: homeController.weekDays
+                                      .map(
+                                          (item) => costBar(item, Colors.green))
+                                      .toList(),
+                                )
+                              //ListView.builder(itemBuilder: ((context, index) => costBar(homeController.weekDays[index], Colors.green))))
                               : Row(children: [
                                   Expanded(
                                     child: Row(

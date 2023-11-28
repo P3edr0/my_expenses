@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:meus_gastos/presentation/ui/controller/home_controller.dart';
 import 'package:provider/provider.dart';
 
 import 'presentation/ui/controller/add_expense_controller.dart';
@@ -16,8 +17,15 @@ class MyExpenses extends StatelessWidget {
   const MyExpenses({super.key});
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-        create: (context) => AddExpenseController(),
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => AddExpenseController(),
+          ),
+          Provider(
+            create: (context) => HomeController(),
+          ),
+        ],
         child: const MaterialApp(
           localizationsDelegates: [
             GlobalWidgetsLocalizations.delegate,
